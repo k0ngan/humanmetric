@@ -101,14 +101,13 @@ for t in TESTIMONIALS:
     </div>
     ''', unsafe_allow_html=True)
 st.markdown('</div></div>', unsafe_allow_html=True)
-# Sidebar (recomendado)
-st.sidebar.page_link("pages/2_Crear_Postulacion.py", label="📝 Crear Postulación")
-st.sidebar.page_link("pages/4_Postular_Con_Video.py", label="🎥 Postular con Video")
-
-# (Opcional) En el cuerpo, enlaces en lugar de botones:
-st.page_link("pages/2_Crear_Postulacion.py", label="📝 Crear Postulación")
-st.page_link("pages/4_Postular_Con_Video.py", label="🎥 Postular con Video")
-
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("📝 Crear Postulación"):
+        st.switch_page("pages/2_Crear_Postulacion.py")
+with col2:
+    if st.button("🎥 Postular con Video"):
+        st.switch_page("pages/4_Postular_Con_Video.py")
 
 # ===== CTA Footer =====
 st.markdown('<div class="footer">© {year} HumanMetrics — Todos los derechos reservados.</div>'.format(year=__import__("datetime").datetime.now().year), unsafe_allow_html=True)
