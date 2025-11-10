@@ -1,23 +1,76 @@
 import streamlit as st
 
 st.set_page_config(page_title="Postular con Video — HumanMetrics", layout="wide")
-st.title("Postular al Cargo (Demo)")
-st.caption("Formulario visual de postulación. Los videos se graban en la página y puedes descargarlos.")
 
-st.subheader("Datos del postulante")
+# ==============================
+# Descripción del cargo (visible al postulante)
+# ==============================
+st.title("Analista de Experiencia del Cliente")
+st.caption("Área: Experiencia del Cliente y Mejora de Procesos · Ubicación: Lima, Perú")
+
+st.subheader("🎯 Propósito del Cargo")
+st.write("""
+Diseñar, analizar y ejecutar iniciativas orientadas a optimizar la experiencia del cliente en canales presenciales y digitales,
+garantizando una atención eficiente, empática y alineada con los estándares de servicio del banco. Contribuir a la mejora continua
+de procesos mediante el seguimiento de indicadores y la implementación de proyectos de optimización.
+""")
+
+with st.expander("🧩 Responsabilidades", expanded=True):
+    st.markdown("""
+- Analizar y monitorear NPS, tiempos de atención, reclamos y resolución de casos.  
+- Levantar oportunidades de mejora a partir de datos y retroalimentación de usuarios.  
+- Diseñar flujos y propuestas que reduzcan tiempos de respuesta y mejoren la eficiencia operativa.  
+- Coordinar proyectos con áreas internas; comunicación con equipos técnicos y gerenciales.  
+- Elaborar reportes y presentaciones para jefaturas y comités.  
+- Implementar herramientas en Excel y otras plataformas para automatizar reportes y análisis.  
+- Documentar procesos, metodologías y resultados.  
+- Promover una cultura de servicio basada en empatía, respeto y mejora continua.
+""")
+
+with st.expander("📋 Requisitos", expanded=True):
+    st.markdown("""
+- Estudiante avanzado o egresado de Ingeniería Industrial, Administración o afín.  
+- ≥1 año en atención al cliente o análisis de procesos.  
+- Excel intermedio/avanzado y herramientas de gestión (Google Workspace, Trello, **Power BI** deseable).  
+- Habilidades analíticas, comunicación efectiva, trabajo en equipo.  
+- Capacidad para entornos dinámicos y bajo presión.  
+- Español nativo; Inglés intermedio (deseable).
+""")
+
+with st.expander("💡 Deseables", expanded=False):
+    st.markdown("""
+- Gestión de proyectos o mejora continua (Lean/Six Sigma básico).  
+- Automatización de reportes (macros u otras herramientas).  
+- Experiencia en atención digital o transformación del servicio al cliente.
+""")
+
+with st.expander("📈 Indicadores de Éxito (KPIs)", expanded=False):
+    st.markdown("""
+- Reducción de tiempos de atención ≥ 30%.  
+- Incremento del NPS u otras métricas de satisfacción.  
+- Cumplimiento de plazos y entregables de proyectos.  
+- Implementación de reportes automatizados o dashboards funcionales.
+""")
+
+st.divider()
+
+# ==============================
+# Formulario de Postulación
+# ==============================
+st.subheader("📝 Datos del Postulante")
 col1, col2 = st.columns(2)
 with col1:
     rut = st.text_input("RUT", placeholder="12.345.678-9")
     nombre = st.text_input("Nombre completo", placeholder="Nombre Apellido Apellido")
 with col2:
     email = st.text_input("Email", placeholder="tucorreo@dominio.cl")
-    telefono = st.text_input("Teléfono (opcional)", placeholder="+56 9 1234 5678")
+    telefono = st.text_input("Teléfono (opcional)", placeholder="+51 9 1234 5678")
 
-cv = st.file_uploader("Subir CV (PDF/DOC/DOCX)", type=["pdf","doc","docx"])
+cv = st.file_uploader("Subir CV (PDF/DOC/DOCX)", type=["pdf", "doc", "docx"])
 
 st.divider()
-st.subheader("Responde en video")
-st.caption("Graba desde el navegador. Al finalizar, descarga el .webm (simulado).")
+st.subheader("🎥 Responde en video")
+st.caption("Graba desde el navegador. Al finalizar, podrás **descargar** el archivo .webm (cliente).")
 
 QUESTIONS = [
     "Cuéntanos un proyecto reciente del que te sientas orgulloso.",
@@ -26,7 +79,8 @@ QUESTIONS = [
 ]
 
 def recorder(question_text: str, key_sfx: str):
-    html = '''
+    # Grabación en cliente con MediaRecorder (no sube archivos; entrega enlace de descarga local)
+    html = f'''
     <div style="padding:12px; border:1px solid #1E293B; border-radius:12px;">
       <div style="font-weight:600; margin-bottom:6px;">{question_text}</div>
       <video id="v_{key_sfx}" autoplay playsinline muted style="width:100%; max-height:260px; background:#000; border-radius:8px;"></video>
@@ -45,7 +99,7 @@ def recorder(question_text: str, key_sfx: str):
       const msg = document.getElementById("msg_{key_sfx}");
       let stream = null, rec = null, chunks = [];
 
-      async function start(){{
+      async function start(){
         try{{
           stream = await navigator.mediaDevices.getUserMedia({{video:true, audio:true}});
           v.srcObject = stream;
@@ -66,7 +120,7 @@ def recorder(question_text: str, key_sfx: str):
           console.error(err);
           msg.textContent = "No se pudo acceder a la cámara/micrófono.";
         }}
-      }}
+      }
       function stop(){{
         if(rec && rec.state !== "inactive") rec.stop();
         if(stream) {{ stream.getTracks().forEach(t => t.stop()); }}
@@ -75,7 +129,7 @@ def recorder(question_text: str, key_sfx: str):
       startBtn.addEventListener("click", start);
       stopBtn.addEventListener("click", stop);
     </script>
-    '''.format(question_text=question_text, key_sfx=key_sfx)
+    '''
     st.components.v1.html(html, height=380)
 
 for i, q in enumerate(QUESTIONS, start=1):
@@ -84,3 +138,11 @@ for i, q in enumerate(QUESTIONS, start=1):
 st.divider()
 if st.button("Enviar Postulación (simulado)"):
     st.success("Postulación enviada (simulada).")
+    st.write({
+        "rut": rut,
+        "nombre": nombre,
+        "email": email,
+        "telefono": telefono,
+        "cv_subido": "Sí" if cv else "No",
+        "videos": "Grabados en el navegador y descargados como .webm (cliente)"
+    })
