@@ -33,9 +33,6 @@ st.markdown('''
   </div>
 </div>
 ''', unsafe_allow_html=True)
-st.sidebar.page_link("pages/2_Crear_Postulacion.py", label="📝 Crear Postulación")
-st.sidebar.page_link("pages/4_Postular_Con_Video.py", label="🎥 Postular con Video")
-
 
 # ===== KPIs =====
 st.markdown('''
