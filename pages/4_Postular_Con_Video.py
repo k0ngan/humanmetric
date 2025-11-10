@@ -80,56 +80,59 @@ QUESTIONS = [
 
 def recorder(question_text: str, key_sfx: str):
     # Grabación en cliente con MediaRecorder (no sube archivos; entrega enlace de descarga local)
-    html = f'''
+    # Use a plain string template with unique tokens to avoid f-string brace parsing issues
+    html = '''
     <div style="padding:12px; border:1px solid #1E293B; border-radius:12px;">
-      <div style="font-weight:600; margin-bottom:6px;">{question_text}</div>
-      <video id="v_{key_sfx}" autoplay playsinline muted style="width:100%; max-height:260px; background:#000; border-radius:8px;"></video>
+      <div style="font-weight:600; margin-bottom:6px;">%%QUESTION%%</div>
+      <video id="v_%%KEY%%" autoplay playsinline muted style="width:100%; max-height:260px; background:#000; border-radius:8px;"></video>
       <div style="display:flex; gap:8px; margin-top:8px;">
-        <button id="start_{key_sfx}" style="padding:8px 12px; border-radius:8px; background:#0E7490; color:#fff; border:0;">Iniciar</button>
-        <button id="stop_{key_sfx}" style="padding:8px 12px; border-radius:8px; background:#334155; color:#fff; border:0;" disabled>Detener</button>
-        <a id="dl_{key_sfx}" style="padding:8px 12px; border-radius:8px; background:#065f46; color:#fff; text-decoration:none; display:none;">Descargar video</a>
+        <button id="start_%%KEY%%" style="padding:8px 12px; border-radius:8px; background:#0E7490; color:#fff; border:0;">Iniciar</button>
+        <button id="stop_%%KEY%%" style="padding:8px 12px; border-radius:8px; background:#334155; color:#fff; border:0;" disabled>Detener</button>
+        <a id="dl_%%KEY%%" style="padding:8px 12px; border-radius:8px; background:#065f46; color:#fff; text-decoration:none; display:none;">Descargar video</a>
       </div>
-      <div id="msg_{key_sfx}" style="color:#94A3B8; font-size:12px; margin-top:6px;">Permite acceso a tu cámara y micrófono para grabar.</div>
+      <div id="msg_%%KEY%%" style="color:#94A3B8; font-size:12px; margin-top:6px;">Permite acceso a tu cámara y micrófono para grabar.</div>
     </div>
     <script>
-      const v = document.getElementById("v_{key_sfx}");
-      const startBtn = document.getElementById("start_{key_sfx}");
-      const stopBtn = document.getElementById("stop_{key_sfx}");
-      const dl = document.getElementById("dl_{key_sfx}");
-      const msg = document.getElementById("msg_{key_sfx}");
+      const v = document.getElementById("v_%%KEY%%");
+      const startBtn = document.getElementById("start_%%KEY%%");
+      const stopBtn = document.getElementById("stop_%%KEY%%");
+      const dl = document.getElementById("dl_%%KEY%%");
+      const msg = document.getElementById("msg_%%KEY%%");
       let stream = null, rec = null, chunks = [];
 
       async function start(){
-        try{{
-          stream = await navigator.mediaDevices.getUserMedia({{video:true, audio:true}});
+        try{
+          stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
           v.srcObject = stream;
           chunks = [];
-          rec = new MediaRecorder(stream, {{mimeType: "video/webm"}});
-          rec.ondataavailable = e => {{ if(e.data.size>0) chunks.push(e.data); }};
-          rec.onstop = () => {{
-            const blob = new Blob(chunks, {{type:"video/webm"}});
+          rec = new MediaRecorder(stream, {mimeType: "video/webm"});
+          rec.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
+          rec.onstop = () => {
+            const blob = new Blob(chunks, {type:"video/webm"});
             const url = URL.createObjectURL(blob);
-            dl.href = url; dl.download = "respuesta_{key_sfx}.webm";
+            dl.href = url; dl.download = "respuesta_%%KEY%%.webm";
             dl.style.display = "inline-block";
             msg.textContent = "Grabación lista. Descarga el archivo .webm.";
-          }};
+          };
           rec.start();
           startBtn.disabled = true; stopBtn.disabled = false;
           msg.textContent = "Grabando...";
-        }}catch(err){{
+        }catch(err){
           console.error(err);
           msg.textContent = "No se pudo acceder a la cámara/micrófono.";
-        }}
+        }
       }
-      function stop(){{
+      function stop(){
         if(rec && rec.state !== "inactive") rec.stop();
-        if(stream) {{ stream.getTracks().forEach(t => t.stop()); }}
+        if(stream) { stream.getTracks().forEach(t => t.stop()); }
         startBtn.disabled = false; stopBtn.disabled = true;
-      }}
+      }
       startBtn.addEventListener("click", start);
       stopBtn.addEventListener("click", stop);
     </script>
     '''
+    # Replace unique tokens with runtime values
+    html = html.replace('%%QUESTION%%', question_text).replace('%%KEY%%', key_sfx)
     st.components.v1.html(html, height=380)
 
 for i, q in enumerate(QUESTIONS, start=1):
