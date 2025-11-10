@@ -1,15 +1,39 @@
-
 import streamlit as st
 from utils_ui import inject_css
 from dummy_data import FEATURED_JOBS, CATEGORIES, TESTIMONIALS
 
 st.set_page_config(page_title="HumanMetrics — Empleos y Talento", layout="wide")
-inject_css(css_file="styles.css")
 
-# 🔹 NUEVOS BOTONES
-st.title("Conectamos el talento con las oportunidades correctas.")
-st.caption("Busca, postula y crea ofertas con análisis inteligente.")
-# ===== Hero =====
+# CSS base + ajustes mobile
+MOBILE_TWEAKS = """
+/* Botones anchos y cómodos en mobile */
+.stButton > button { width:100%; padding:14px 18px; font-weight:700; border-radius:12px; }
+
+/* Hero y buscador: stack en pantallas pequeñas */
+@media (max-width: 820px){
+  .hero{ grid-template-columns: 1fr !important; padding:18px; border-radius:16px; }
+  .searchbar{ grid-template-columns: 1fr !important; gap:10px; }
+}
+
+/* KPIs y grids colapsan a 1-2 columnas */
+@media (max-width: 1024px){ .kpis{ grid-template-columns: repeat(2,1fr) !important; } }
+@media (max-width: 680px){ .kpis{ grid-template-columns: 1fr !important; } }
+
+/* Cards: márgenes y toque más grande en móvil */
+@media (max-width: 820px){
+  .card{ padding:14px; border-radius:14px; }
+  .card .title{ font-size:17px; }
+}
+
+/* Sidebar link visible y usable en móvil */
+section[data-testid="stSidebar"] { min-width: 260px; }
+"""
+
+# Inyecta estilos (tu styles.css + tweaks mobile)
+inject_css(css_file="styles.css")
+inject_css(MOBILE_TWEAKS)
+
+# ===== HERO =====
 st.markdown('''
 <div class="hero">
   <div>
@@ -26,14 +50,13 @@ st.markdown('''
   <div class="hero-card">
     <strong>Tips para destacar</strong>
     <ul>
-      <li>Optimiza tu CV con 5 logros medibles.</li>
-      <li>Agrega habilidades clave (Python, SQL, Docker, ...).</li>
+      <li>Optimiza tu CV con logros medibles.</li>
+      <li>Resalta habilidades clave (Python, SQL, Power BI...).</li>
       <li>Activa alertas por correo (próximamente).</li>
     </ul>
   </div>
 </div>
 ''', unsafe_allow_html=True)
-
 # ===== KPIs =====
 st.markdown('''
 <div class="kpis">
@@ -67,47 +90,44 @@ for job in FEATURED_JOBS:
       <p class="title">{job["t"]}</p>
       <p class="meta">{job["e"]} — {job["u"]}</p>
       <div>{skills}</div>
-      <div style="margin-top:.6rem; display:flex; gap:.5rem;">
-        <a class="btn" href="#" style="text-decoration:none; padding:.5rem .8rem; border-radius:10px;">Ver</a>
-        <a class="btn" href="#" style="text-decoration:none; background:rgba(14,116,144,.08); padding:.5rem .8rem; border-radius:10px;">Postular</a>
+      <div style="margin-top:.6rem; display:flex; gap:.5rem; flex-wrap:wrap;">
+        <a class="btn" href="#" style="text-decoration:none; padding:.6rem .9rem; border-radius:10px;">Ver</a>
+        <a class="btn" href="#" style="text-decoration:none; background:#0b5d73; padding:.6rem .9rem; border-radius:10px;">Postular</a>
       </div>
     </div>
     ''', unsafe_allow_html=True)
 st.markdown('</div></div>', unsafe_allow_html=True)
 
-# ===== Logos (placeholder) =====
+# ===== Logos =====
 st.markdown('<div class="section"><h3>Empresas que confían</h3>', unsafe_allow_html=True)
 st.markdown('<div class="logos">', unsafe_allow_html=True)
-companies = {
-    "Nómade": "https://nomade.com",
-    "MFN": "https://mfn.com",
-    "UTEM": "https://utem.cl",
-    "Betel": "https://betel.com",
-    "CloudOps": "https://cloudops.com",
-    "Acme": "https://acme.com"
-}
-for name, url in companies.items():
-    st.markdown(f'<a href="{url}" target="_blank" style="text-decoration:none;"><div class="logo">{name}</div></a>', unsafe_allow_html=True)
+for name in ["Nómade", "MFN", "UTEM", "Betel", "CloudOps", "Acme"]:
+    st.markdown(f'<div class="logo">{name}</div>', unsafe_allow_html=True)
 st.markdown('</div></div>', unsafe_allow_html=True)
 
-# ===== Testimonials =====
+# ===== Testimonios =====
 st.markdown('<div class="section"><h3>Testimonios</h3>', unsafe_allow_html=True)
-st.markdown('<div class="testimonials-grid">', unsafe_allow_html=True)
-for t in TESTIMONIALS:
-    st.markdown(f'''
-    <div class="testimonial-card">
-      <p class="quote">{t["q"]}</p>
-      <p class="author">— {t["a"]}</p>
-    </div>
-    ''', unsafe_allow_html=True)
-st.markdown('</div></div>', unsafe_allow_html=True)
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("📝 Crear Postulación"):
-        st.switch_page("pages/2_Crear_Postulacion.py")
-with col2:
-    if st.button("🎥 Postular con Video"):
-        st.switch_page("pages/4_Postular_Con_Video.py")
+cols = st.columns(3)
+for i, t in enumerate(TESTIMONIALS):
+    with cols[i % 3]:
+        st.markdown(f'''
+        <div class="card">
+          <p style="margin:0; font-size:16px;">“{t["q"]}”</p>
+          <p class="meta" style="margin:.25rem 0 0;">{t["a"]}</p>
+        </div>
+        ''', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+# CTA principal (stack en móvil)
+c1, c2 = st.columns(2)
+with c1:
+    st.page_link("pages/2_Crear_Postulacion.py", label="📝 Crear Postulación")
+with c2:
+    st.page_link("pages/4_Postular_Con_Video.py", label="🎥 Postular con Video")
 
-# ===== CTA Footer =====
-st.markdown('<div class="footer">© {year} HumanMetrics — Todos los derechos reservados.</div>'.format(year=__import__("datetime").datetime.now().year), unsafe_allow_html=True)
+# ===== Footer =====
+st.markdown(
+    '<div class="footer">© {year} HumanMetrics — Todos los derechos reservados.</div>'.format(
+        year=__import__("datetime").datetime.now().year
+    ),
+    unsafe_allow_html=True
+)
