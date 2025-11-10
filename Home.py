@@ -6,6 +6,18 @@ from dummy_data import FEATURED_JOBS, CATEGORIES, TESTIMONIALS
 st.set_page_config(page_title="HumanMetrics — Empleos y Talento", layout="wide")
 inject_css(css_file="styles.css")
 
+# 🔹 NUEVOS BOTONES
+st.title("Conectamos el talento con las oportunidades correctas.")
+st.caption("Busca, postula y crea ofertas con análisis inteligente.")
+
+col1, col2 = st.columns(2)
+with col1:
+  if st.button("📝 Crear Postulación"):
+    st.switch_page("pages/2_Crear_Postulacion.py")
+with col2:
+  if st.button("🎥 Postular con Video"):
+    st.switch_page("pages/4_Postular_Con_Video.py")
+
 # ===== Hero =====
 st.markdown('''
 <div class="hero">
