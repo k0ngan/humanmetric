@@ -107,7 +107,7 @@ with col1:
         st.switch_page("pages/2_Crear_Postulacion.py")
 with col2:
     if st.button("🎥 Postular con Video"):
-        st.switch_page("pages/4_Postular_Con_Video.py"
+        st.switch_page("pages/4_Postular_Con_Video.py")
 
 # ===== CTA Footer =====
 st.markdown('<div class="footer">© {year} HumanMetrics — Todos los derechos reservados.</div>'.format(year=__import__("datetime").datetime.now().year), unsafe_allow_html=True)
